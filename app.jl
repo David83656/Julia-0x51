@@ -3,7 +3,7 @@ using HTTP
 using JSON
 using StructTypes
 using TextAnalysis
-
+using PyCall
 
 
 #CRUD API
@@ -23,7 +23,8 @@ StructTypes.StructType(::Type{ConversationAnalysis}) = StructTypes.Struct()
 #Analyze of the conversation
 function analyze_conversation(conversation::String)
     #TODO Implement conversation analysis
-    return ConversationAnalysis(1, conversation, "Positive", "AI, Julia, Oxygen")
+    
+    return ConversationAnalysis(id, conversation, "Positive", "AI, Julia, Oxygen")
 end
 
 function analyze_dialog(conversation::String)
@@ -37,10 +38,10 @@ function analyze_sentiments(conversation::String)
 end
 
 
-#Endpoints
 @post "/api/v1/store-conversation" function (req::HTTP.Request)
 
     println("Create Conversation")
+    
     data=JSON.parse(String(HTTP.payload(req)))
     conversation = data["conversation"]
     result = analyze_conversation(conversation)
