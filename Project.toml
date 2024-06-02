@@ -1,7 +1,9 @@
 [deps]
+Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
 HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 Oxygen = "df9a0d86-3283-4920-82dc-4555fc0d1d8b"
 PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 SQLite = "0aa819cd-b072-5ff4-a722-6bc24af294d9"
 StructTypes = "856f2bd8-1eba-4b0a-8007-ebc267875bd4"
+TextAnalysis = "a2db99b7-8b79-58f8-94bf-bbc811eef33d"
