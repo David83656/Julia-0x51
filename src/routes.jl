@@ -13,4 +13,8 @@ end
     ConversationController.index(req)
 end
 
+@get "/conversation/test-huggingface" function (req::HTTP.Request)
+    ConversationController.test_huggingface(req)
+end
+
 end

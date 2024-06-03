@@ -9,13 +9,18 @@ function ensure_installed(pkg_name::String)
         Pkg.add(pkg_name)
     end
 end
-required_packages = ["Oxygen", "HTTP", "JSON", "StructTypes", "TextAnalysis"]
+required_packages = ["Oxygen", "HTTP", "JSON", "StructTypes", "TextAnalysis", "DotEnv"]
 for pkg in required_packages
     ensure_installed(pkg)
 end
 
 # Import required packages
-using Oxygen, HTTP, JSON, StructTypes, TextAnalysis
+using Oxygen, HTTP, JSON, StructTypes, TextAnalysis, DotEnv
+
+# Load environment variables
+# DotEnv.config(envfile=".env")
+DotEnv.load!()
+
 
 # Routes
 include("routes.jl")

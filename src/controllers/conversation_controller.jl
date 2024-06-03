@@ -18,4 +18,9 @@ function store_conversation(req::HTTP.Request)
     return HTTP.Response(200, JSON.json(result))
 end
 
+function test_huggingface(req::HTTP.Request)
+    result = ConversationService.test_huggingface_connection()
+    return HTTP.Response(200, JSON.json(result))
+end
+
 end
