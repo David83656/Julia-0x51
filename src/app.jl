@@ -9,7 +9,7 @@ function ensure_installed(pkg_name::String)
         Pkg.add(pkg_name)
     end
 end
-required_packages = ["Oxygen", "HTTP", "JSON", "StructTypes", "TextAnalysis"]
+required_packages = ["Oxygen", "HTTP", "JSON", "StructTypes", "TextAnalysis","CSV", "DataFrames","XLSX"]
 for pkg in required_packages
     ensure_installed(pkg)
 end
@@ -21,4 +21,4 @@ using Oxygen, HTTP, JSON, StructTypes, TextAnalysis
 include("routes.jl")
 using .Routes
 
-serve(PORT=8080)
+serve(PORT=8080)    
