@@ -6,23 +6,31 @@ using DataFrames
 using XLSX
 struct ConversationAnalysis
     id::Int
-    conversation:: String
-    client::String
+    dialog::String
     sentiment::String
+    keywords::String
 end
 
 StructTypes.StructType(::Type{ConversationAnalysis}) = StructTypes.Struct()
 
 # Listas extendidas de palabras positivas y negativas
-const positive_words = CSV.read("src/services/positive_words.csv", DataFrame, header=false)
-const negative_words = CSV.read("src/services/negative_words.csv", DataFrame, header=false)
-const stop_words = CSV.read("src/services/stop_words.csv", DataFrame, header=false)
+const positive_words = CSV.read("src/services/datasets/positive_words.csv", DataFrame, header=false)
+const negative_words = CSV.read("src/services/datasets/negative_words.csv", DataFrame, header=false)
+const stop_words = CSV.read("src/services/datasets/stop_words.csv", DataFrame, header=false)
 
 # Columna 1 del dataset
 positive_words_vector = positive_words[!, 1]
 negative_words_vector = negative_words[!, 1]
 stop_words_vector = stop_words[!, 1]
 
+# Función para analizar la conversación
+function analyze_conversation(conversation::String)::ConversationAnalysis
+    id=1
+    sentiment = analyze_sentiment(conversation)
+    keywords = extract_keywords(conversation, sentiment)
+    keywords_string= join(keywords, ", ")
+    return ConversationAnalysis(id,conversation,sentiment, keywords_string)
+end
 
 # Ahora `negative_words` es un vector de cadenas, donde cada cadena es una línea del archivo CSV.
 # Función para analizar el sentimiento
@@ -39,7 +47,7 @@ function analyze_sentiment(conversation::String)::String
     end
 end
 # Función para extraer palabras clave (tokenización manual)
-function extract_keywords(conversation::String)::Vector{String}
+function extract_keywords(conversation::String, sentiment::String)::Vector{String}
     words = split(conversation, r"\W+")
     words = filter(w -> !(w in stop_words_vector) && length(w) > 2, lowercase.(words))
     
@@ -52,24 +60,30 @@ function extract_keywords(conversation::String)::Vector{String}
     end
     # Ordenar y tomar las palabras clave más frecuentes
     sorted_words = sort(collect(word_counts), by=last, rev=true)
-    top_keywords = first.(sorted_words[1:min(10, length(sorted_words))])
+    top_keywords = first.(sorted_words[1:min(500, length(sorted_words))])
 
     # Escribir las top_keywords en un archivo de Excel
-    XLSX.openxlsx("top_keywords.xlsx"+conversation.id, mode="w") do xf
+    XLSX.openxlsx("src/services/plot_data/top_keywords.xlsx", mode="w") do xf
         sheet = xf[1]
-            for (i, keyword) in enumerate(top_keywords)
-                sheet["A$i"] = keyword
-            end
+        sheet["A1"] = "Palabras clave"
+        sheet["B1"] = "Sentimiento encontrado"
+        sheet["C1"] = "Valor"  # Add a new column header for the value
+    
+        # Find the length of the longest keyword
+        max_length = maximum(length.(top_keywords))
+    
+        for (i, keyword) in enumerate(top_keywords)
+            sheet["A$(i+1)"] = keyword
+            sheet["B$(1)"] = sentiment
+            value = length(keyword) / max_length
+            sheet["C$(i+1)"] = value
         end
+    end
     return top_keywords
 end
 
-# Función para analizar la conversación
-function analyze_conversation(conversation::String)::ConversationAnalysis
-    sentiment = analyze_sentiment(conversation)
-    keywords = extract_keywords(conversation)
-    return ConversationAnalysis(id, conversation,client, sentiment)
-end
+
+
 
 function stem_spanish(word::String)::String
     # 1. Normalización
@@ -141,4 +155,4 @@ function stem_spanish(word::String)::String
 
     return word
 end
-end # module ConversationService
+end 
